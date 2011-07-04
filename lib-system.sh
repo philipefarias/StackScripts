@@ -19,7 +19,7 @@ function setup_hostname {
   HOST=`echo $HOSTNAME | sed 's/\(\[a-z0-9\]\)*\..*/\1/'`
   echo "$HOST" >  /etc/hostname
   echo "`system_primary_ip` $HOSTNAME $HOST" >> /etc/hosts
-  sed -i "/(SET_HOSTNAME='yes')/#\1/" /etc/default/dhcpcd
+  sed -i "s/^SET_HOSTNAME=.*/#&/" /etc/default/dhcpcd
   start hostname
 }
 
