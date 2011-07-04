@@ -7,6 +7,7 @@
 # <udf name="user_name" label="Unprivileged User Account" />
 # <udf name="user_password" label="Unprivileged User Password" />
 # <udf name="user_sshkey" label="Public Key for User" default="" />
+# <udf name="user_groups" label="User Groups" default="admin" />
 #
 # <UDF name="sshd_permitrootlogin" label="Permit SSH root login" oneof="No,Yes" default="No" />
 # <UDF name="sshd_passwordauth" label="Use SSH password authentication" oneOf="Yes,No" default="Yes" example="Turn off password authentication if you have added a Public Key" />
