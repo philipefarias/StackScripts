@@ -16,6 +16,8 @@
 # <udf name="couch_version" label="Apache CouchDB Version" default="1.1.0" />
 # <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
 
+exec &> /root/stackscript.log
+
 source <ssinclude StackScriptID="1">
 source <ssinclude StackScriptID="123"> # lib-system-ubuntu
 
