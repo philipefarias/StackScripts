@@ -17,17 +17,12 @@
 # <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
 
 source <ssinclude StackScriptID="1">
-source <ssinclude StackScriptID="123"> # lib-system-ubuntu
 source <ssinclude StackScriptID="2865"> # lib-system
 
 system_update
 update_locale_en_US_UTF_8
 
 setup_hostname "$HOSTNAME"
-
-# Install firewall and some security utilities
-apt-get -y install fail2ban logcheck logcheck-database ufw
-
 
 # Create user account
 USER_GROUPS="admin"
@@ -42,11 +37,6 @@ SSHD_PASSWORDAUTH="no"
 SSHD_PUBKEYAUTH="yes"
 configure_sshd
 
-install_postfix "$ROOT_EMAIL" "$USER_NAME"
-
-install_monit "$ROOT_EMAIL"
-install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
-
 # Install CouchDB
 source <ssinclude StackScriptID="2847">
 COUCH_VERSION="1.1.0"
@@ -55,6 +45,9 @@ apt-get -y install curl build-essential
 
 build_spidermonkey
 build_couchdb "apache-couchdb-${COUCH_VERSION}"
+
+# Install firewall and some security utilities
+apt-get -y install fail2ban logcheck logcheck-database ufw
 
 # Configure and enable firewall
 ufw logging on
@@ -67,6 +60,11 @@ ufw enable
 
 # Install some good stuff
 apt-get -y install bash-completion less vim wget
+
+install_postfix "$ROOT_EMAIL" "$USER_NAME"
+
+install_monit "$ROOT_EMAIL"
+install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
 
 # Send info message
 if [ -n "$NOTIFY_EMAIL" ]; then
