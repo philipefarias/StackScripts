@@ -46,10 +46,9 @@ apt-get -y install curl build-essential
 build_spidermonkey
 build_couchdb "apache-couchdb-${COUCH_VERSION}"
 
-# Install firewall and some security utilities
-apt-get -y install fail2ban logcheck logcheck-database ufw
+# Install and configure firewall
+apt-get -y install ufw
 
-# Configure and enable firewall
 ufw logging on
 ufw default deny
 
@@ -58,18 +57,27 @@ ufw allow 5984 # CouchDB port
 
 ufw enable
 
-# Install some good stuff
-apt-get -y install bash-completion less vim wget
-
+# Simple 'just to send' email server
 install_postfix "$ROOT_EMAIL" "$USER_NAME"
 
+# Monitoring tools
 install_monit "$ROOT_EMAIL"
 install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
 
+# Security tools
+apt-get -y install fail2ban logcheck logcheck-database
+
+# Some good stuff
+apt-get -y install bash-completion less vim wget
+
+
+restartServices
+
+
 # Send info message
-if [ -n "$NOTIFY_EMAIL" ]; then
+if [ -n "$ROOT_EMAIL" ]; then
   vps_hostname="`cat /etc/hostname`"
-  mail -s "Your Linode VPS "$vps_hostname" is configured" "$NOTIFY_EMAIL" <<EOD
+  mail -s "Your Linode VPS "$vps_hostname" is configured" "$ROOT_EMAIL" <<EOD
 Hi,
 
 Your Linode VPS configuration is completed.
@@ -83,5 +91,3 @@ root
 Linode VPS "$vps_hostname"
 EOD
 fi
-
-reboot
