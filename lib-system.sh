@@ -29,6 +29,11 @@ function update_locale_en_US_UTF_8 {
   update-locale LANG=en_US.UTF-8
 }
 
+function set_timezone {
+  # $1 - timezone (zoneinfo file)
+  ln -sf "/usr/share/zoneinfo/$1" /etc/localtime
+}
+
 function system_add_user {
   # $1 - username
   # $2 - password
