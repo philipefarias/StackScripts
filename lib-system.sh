@@ -29,19 +29,21 @@ function update_locale_en_US_UTF_8 {
   update-locale LANG=en_US.UTF-8
 }
 
-function install_postfix {
-  # $1 - root email
-  # $2 - username
-  postfix_install_loopback_only # SS1
-  #install mail sending utilities
-  apt-get -y install mailutils
-  #configure root alias
-  echo "root: $1" >> /etc/aliases
-  echo "$2: root" >> /etc/aliases
-  cat /etc/hostname > /etc/mailname
-  newaliases
-  sed -i "s/mydestination = localhost, localhost.localdomain, , localhost/mydestination = localhost, localhost.localdomain, $HOSTNAME/" /etc/postfix/main.cf
-  service postfix restart
+function system_add_user {
+  # $1 - username
+  # $2 - password
+  # $3 - groups
+  USERNAME=`lower $1`
+  PASSWORD=$2
+  SUDO_GROUP=$3
+  SHELL="/bin/bash"
+  useradd --create-home --shell "$SHELL" --user-group --groups "$SUDO_GROUP" "$USERNAME"
+  echo "$USERNAME:$PASSWORD" | chpasswd
+}
+
+function get_user_home {
+  # $1 - username
+  cat /etc/passwd | grep "^$1:" | cut --delimiter=":" -f6
 }
 
 # SSH functions
@@ -57,7 +59,7 @@ function add_user_ssh_key {
     # $1 - username
     # $2 - ssh key
     USERNAME=`lower $1`
-    USER_HOME=`system_get_user_home "$USERNAME"`
+    USER_HOME=`get_user_home "$USERNAME"`
     sudo -u "$USERNAME" mkdir "$USER_HOME/.ssh"
     sudo -u "$USERNAME" touch "$USER_HOME/.ssh/authorized_keys"
     sudo -u "$USERNAME" echo "$2" >> "$USER_HOME/.ssh/authorized_keys"
@@ -91,6 +93,22 @@ function sshd_config_pubkeyauthentication {
 
 function sshd_config_passwordauthentication {
     sshd_config_edit_bool "PasswordAuthentication" "$1"
+}
+
+# Email
+function install_postfix {
+  # $1 - root email
+  # $2 - username
+  postfix_install_loopback_only # SS1
+  #install mail sending utilities
+  apt-get -y install mailutils
+  #configure root alias
+  echo "root: $1" >> /etc/aliases
+  echo "$2: root" >> /etc/aliases
+  cat /etc/hostname > /etc/mailname
+  newaliases
+  sed -i "s/mydestination = localhost, localhost.localdomain, , localhost/mydestination = localhost, localhost.localdomain, $HOSTNAME/" /etc/postfix/main.cf
+  service postfix restart
 }
 
 # Monit and Munin
@@ -129,7 +147,7 @@ function install_munin_node {
   # $1 - node hostname
   # $2 - munin server ip
   apt-get -y install munin-node
-  sed -i "s/host_name .*/host_name $1/" /etc/munin/munin-node.conf
-  sed -i "s/allow .*/allow \^$2\$/" /etc/munin/munin-node.conf
+  sed -i "s/^#host_name .*/host_name $1/" /etc/munin/munin-node.conf
+  sed -i "s/^allow .*/&\nallow \^$2\$/" /etc/munin/munin-node.conf
   service munin-node restart
 }
