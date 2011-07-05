@@ -10,6 +10,7 @@
 #
 # <udf name="sshd_port" label="SSH Port" default="22" />
 # <udf name="hostname" label="System Hostname" default="myvps" example="Name of your server, i.e. linode1" />
+# <udf name="timezone" label="System Timezone" default="" example="Zoneinfo file on the server, i.e. America/Sao_Paulo" />
 # <udf name="root_email" label="Root Email" />
 #
 # <udf name="munin_server_ip" label="Munin Server IP" default="127.0.0.1" />
@@ -23,6 +24,7 @@ system_update
 update_locale_en_US_UTF_8
 
 setup_hostname "$HOSTNAME"
+set_timezone "$TIMEZONE"
 
 # Create user account
 USER_GROUPS="admin"
