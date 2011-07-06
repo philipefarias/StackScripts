@@ -57,3 +57,22 @@ function build_couchdb {
   curl http://127.0.0.1:5984/
   # {"couchdb":"Welcome","version":"1.1.0"}
 }
+
+function set_couchdb_port {
+  # $1 - port number
+  # $2 - couch installation prefix
+  sed -i "/port[ ]*=/ s/^.*$/port = $1/" $2/etc/couchdb/local.ini
+}
+
+function set_couchdb_bind_address {
+  # $1 - ip address
+  # $2 - couch installation prefix
+  sed -i "/bind_address[ ]*=/ s/^.*$/bind_address = $1/" $2/etc/couchdb/local.ini
+}
+
+function set_couchdb_admin_user {
+  # $1 - couchdb host
+  # $2 - username
+  # $3 - password
+  curl -X PUT $1/_config/admins/$2 -d "\"$3\""
+}
