@@ -151,7 +151,7 @@ EOT
 function install_munin_node {
   # $1 - node hostname
   # $2 - munin server ip
-  escaped_ip=`echo $2 | sed s/[.]/\\\&/g`
+  escaped_ip=`echo $2 | sed "s/[.]/\\\&/g"`
   apt-get -y install munin-node
   sed -i "s/^#host_name .*/host_name $1/" /etc/munin/munin-node.conf
   sed -i "s/^allow .*/&\nallow \^$escaped_ip\$/" /etc/munin/munin-node.conf
