@@ -56,6 +56,7 @@ ufw default deny
 
 ufw allow ${SSHD_PORT}
 ufw allow 5984 # CouchDB port
+ufw allow munin
 
 ufw enable
 
