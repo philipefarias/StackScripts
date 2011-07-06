@@ -39,6 +39,9 @@ SSHD_PASSWORDAUTH="no"
 SSHD_PUBKEYAUTH="yes"
 configure_sshd
 
+# Simple 'just to send' email server
+install_postfix "$ROOT_EMAIL" "$USER_NAME"
+
 # Install CouchDB
 source <ssinclude StackScriptID="2847">
 COUCH_VERSION="1.1.0"
@@ -48,9 +51,17 @@ apt-get -y install curl build-essential
 build_spidermonkey
 build_couchdb "apache-couchdb-${COUCH_VERSION}"
 
-# Install and configure firewall
-apt-get -y install ufw
+# Monitoring tools
+install_monit "$ROOT_EMAIL"
+install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
 
+# Security tools
+apt-get -y install ufw fail2ban logcheck logcheck-database
+
+# Some good stuff
+apt-get -y install bash-completion less vim wget
+
+# Configure firewall
 ufw logging on
 ufw default deny
 
@@ -59,19 +70,6 @@ ufw allow 5984 # CouchDB port
 ufw allow munin
 
 ufw enable
-
-# Simple 'just to send' email server
-install_postfix "$ROOT_EMAIL" "$USER_NAME"
-
-# Monitoring tools
-install_monit "$ROOT_EMAIL"
-install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
-
-# Security tools
-apt-get -y install fail2ban logcheck logcheck-database
-
-# Some good stuff
-apt-get -y install bash-completion less vim wget
 
 
 restartServices
@@ -86,6 +84,11 @@ Hi,
 Your Linode VPS configuration is completed.
 
 You can now login with ssh to port "$SSHD_PORT" with user "$USER_NAME".
+
+Your firewall status:
+---
+`ufw status`
+---
 
 Thanks for using this StackScript. Follow http://github.com/philipefarias/StackScripts for updates.
 
