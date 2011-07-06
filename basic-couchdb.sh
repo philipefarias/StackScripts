@@ -16,6 +16,10 @@
 # <udf name="munin_server_ip" label="Munin Server IP" default="127.0.0.1" />
 #
 # <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
+# <udf name="couch_port" label="CouchDB httpd Port" default="5984" />
+# <udf name="couch_bind_address" label="CouchDB httpd Bind Address" default="127.0.0.1" />
+# <udf name="couch_user" label="CouchDB Admin User" default="admin" />
+# <udf name="couch_password" label="CouchDB Admin Password" />
 
 source <ssinclude StackScriptID="1">
 source <ssinclude StackScriptID="2865"> # lib-system
@@ -51,6 +55,11 @@ apt-get -y install curl build-essential
 build_spidermonkey
 build_couchdb "apache-couchdb-${COUCH_VERSION}"
 
+set_couchdb_port "$COUCH_PORT"
+set_couchdb_bind_address "$COUCH_BIND_ADDRESS"
+COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
+set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
+
 # Monitoring tools
 install_monit "$ROOT_EMAIL"
 install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
@@ -66,7 +75,7 @@ ufw logging on
 ufw default deny
 
 ufw allow ${SSHD_PORT}
-ufw allow 5984 # CouchDB port
+ufw allow ${COUCH_PORT}
 ufw allow munin
 
 ufw enable
@@ -84,6 +93,10 @@ Hi,
 Your Linode VPS configuration is completed.
 
 You can now login with ssh to port "$SSHD_PORT" with user "$USER_NAME".
+
+CouchDB is installed and configured to this settings:
+  Host: $COUCH_HOST
+  User: $COUCH_USER
 
 Your firewall status:
 ---
