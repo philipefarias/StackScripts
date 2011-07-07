@@ -16,8 +16,6 @@
 # <udf name="munin_server_ip" label="Munin Server IP" default="127.0.0.1" />
 #
 # <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
-# <udf name="couch_port" label="CouchDB httpd Port" default="5984" />
-# <udf name="couch_bind_address" label="CouchDB httpd Bind Address" default="127.0.0.1" />
 # <udf name="couch_user" label="CouchDB Admin User" default="admin" />
 # <udf name="couch_password" label="CouchDB Admin Password" />
 
@@ -49,6 +47,9 @@ install_postfix "$ROOT_EMAIL" "$USER_NAME"
 # Install CouchDB
 source <ssinclude StackScriptID="2847">
 COUCH_VERSION="1.1.0"
+COUCH_BIND_ADDRESS="0.0.0.0"
+COUCH_PORT="5984"
+COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
 curl http://${COUCH_MIRROR}/couchdb/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
 apt-get -y install curl build-essential
 
@@ -57,7 +58,6 @@ build_couchdb "apache-couchdb-${COUCH_VERSION}"
 
 set_couchdb_port "$COUCH_PORT"
 set_couchdb_bind_address "$COUCH_BIND_ADDRESS"
-COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
 
 # Monitoring tools
@@ -82,6 +82,7 @@ ufw enable
 
 
 restartServices
+service couchdb start #somehow it don't happen on the restartServices
 
 
 # Send info message
