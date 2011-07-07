@@ -59,6 +59,7 @@ build_couchdb "apache-couchdb-${COUCH_VERSION}"
 set_couchdb_port "$COUCH_PORT"
 set_couchdb_bind_address "$COUCH_BIND_ADDRESS"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
+set_couchdb_require_valid_user "true"
 
 # Monitoring tools
 install_monit "$ROOT_EMAIL"
