@@ -56,10 +56,10 @@ apt-get -y install curl build-essential
 build_spidermonkey
 build_couchdb "apache-couchdb-${COUCH_VERSION}"
 
-set_couchdb_port "$COUCH_PORT"
-set_couchdb_bind_address "$COUCH_BIND_ADDRESS"
+set_local_couchdb_port "$COUCH_PORT"
+set_local_couchdb_bind_address "$COUCH_BIND_ADDRESS"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
-set_couchdb_require_valid_user "true"
+set_local_couchdb_require_valid_user "true"
 
 # Monitoring tools
 install_monit "$ROOT_EMAIL"
@@ -99,7 +99,7 @@ SSH Access:
 ssh://$USER_NAME@$reverse_dns
 
 CouchDB:
-http://$reverse_dns:5984/
+http://$reverse_dns:$COUCH_PORT/
 
 Your firewall status:
 ---
