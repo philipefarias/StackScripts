@@ -17,8 +17,9 @@ function setup_hostname {
     export HOSTNAME=get_rdns_primary_ip
   fi
   HOST=`echo $HOSTNAME | sed 's/\(\[a-z0-9\]\)*\..*/\1/'`
+  HOSTS_LINE="`system_primary_ip`\t$HOSTNAME\t$HOST"
   echo "$HOST" >  /etc/hostname
-  echo "`system_primary_ip` $HOSTNAME $HOST" >> /etc/hosts
+  sed -i "s/^127\.0\.0\.1 .*$/&\n$HOSTS_LINE/" /etc/hosts
   sed -i "s/^SET_HOSTNAME=.*/#&/" /etc/default/dhcpcd
   start hostname
 }
