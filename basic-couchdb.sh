@@ -88,16 +88,17 @@ service couchdb start #somehow it don't happen on the restartServices
 # Send info message
 if [ -n "$ROOT_EMAIL" ]; then
   vps_hostname="`cat /etc/hostname`"
+  reverse_dns="`get_rdns`"
   mail -s "Your Linode VPS "$vps_hostname" is configured" "$ROOT_EMAIL" <<EOD
 Hi,
 
 Your Linode VPS configuration is completed.
 
-You can now login with ssh to port "$SSHD_PORT" with user "$USER_NAME".
+SSH Access:
+ssh://$USER_NAME@$reverse_dns
 
-CouchDB is installed and configured to this settings:
-  Host: $COUCH_HOST
-  User: $COUCH_USER
+CouchDB:
+http://$reverse_dns:5984/
 
 Your firewall status:
 ---
