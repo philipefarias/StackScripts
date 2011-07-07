@@ -89,7 +89,7 @@ service couchdb start #somehow it don't happen on the restartServices
 # Send info message
 if [ -n "$ROOT_EMAIL" ]; then
   vps_hostname="`cat /etc/hostname`"
-  reverse_dns="`get_rdns`"
+  reverse_dns="`get_rdns_primary_ip`"
   mail -s "Your Linode VPS "$vps_hostname" is configured" "$ROOT_EMAIL" <<EOD
 Hi,
 
