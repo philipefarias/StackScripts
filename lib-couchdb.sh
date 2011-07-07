@@ -58,13 +58,13 @@ function build_couchdb {
   # {"couchdb":"Welcome","version":"1.1.0"}
 }
 
-function set_couchdb_port {
+function set_local_couchdb_port {
   # $1 - port number
   # $2 - couch installation prefix
   sed -i "/port[ ]*=/ s/^.*$/port = $1/" $2/etc/couchdb/local.ini
 }
 
-function set_couchdb_bind_address {
+function set_local_couchdb_bind_address {
   # $1 - ip address
   # $2 - couch installation prefix
   sed -i "/bind_address[ ]*=/ s/^.*$/bind_address = $1/" $2/etc/couchdb/local.ini
@@ -77,7 +77,7 @@ function set_couchdb_admin_user {
   curl -X PUT $1/_config/admins/$2 -d "\"$3\""
 }
 
-function set_couchdb_require_valid_user {
+function set_local_couchdb_require_valid_user {
   # $1 - true/false
   # $2 - couch installation prefix
   sed -i "s/^;[ ]*\(WWW-Authenticate[ ]*=.*\)$/\1/" $2/etc/couchdb/local.ini
