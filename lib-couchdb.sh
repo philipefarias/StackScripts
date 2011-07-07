@@ -76,3 +76,10 @@ function set_couchdb_admin_user {
   # $3 - password
   curl -X PUT $1/_config/admins/$2 -d "\"$3\""
 }
+
+function set_couchdb_require_valid_user {
+  # $1 - true/false
+  # $2 - couch installation prefix
+  sed -i "s/^;[ ]*\(WWW-Authenticate[ ]*=.*\)$/\1/" $2/etc/couchdb/local.ini
+  sed -i "s/^;[ ]*\(require_valid_user[ ]*=\)\(.*\)$/\1 $1/" $2/etc/couchdb/local.ini
+}
