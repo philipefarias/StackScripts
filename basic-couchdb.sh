@@ -25,7 +25,7 @@ source <ssinclude StackScriptID="2865"> # lib-system
 system_update
 update_locale_en_US_UTF_8
 
-setup_hostname "$HOSTNAME"
+set_hostname "$HOSTNAME"
 set_timezone "$TIMEZONE"
 
 # Create user account
@@ -60,6 +60,7 @@ set_local_couchdb_port "$COUCH_PORT"
 set_local_couchdb_bind_address "$COUCH_BIND_ADDRESS"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
 set_local_couchdb_require_valid_user "true"
+touch /tmp/restart-couchdb
 
 # Monitoring tools
 install_monit "$ROOT_EMAIL"
@@ -75,10 +76,7 @@ configure_rkhunter
 configure_logwatch
 configure_ufw "$SSHD_PORT" "$COUCH_PORT" "munin"
 
-
-restartServices
-service couchdb start # somehow the restartServices function don't do this
-
+restart_services
 
 # Send info message
 if [ -n "$ROOT_EMAIL" ]; then
