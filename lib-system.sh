@@ -46,6 +46,8 @@ function system_add_user {
   SHELL="/bin/bash"
   useradd --create-home --shell "$SHELL" --user-group --groups "$SUDO_GROUP" "$USERNAME"
   echo "$USERNAME:$PASSWORD" | chpasswd
+  #lock out root
+  passwd -l root
 }
 
 function get_user_home {
