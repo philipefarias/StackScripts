@@ -33,6 +33,7 @@ function update_locale_en_US_UTF_8 {
 function set_timezone {
   # $1 - timezone (zoneinfo file)
   ln -sf "/usr/share/zoneinfo/$1" /etc/localtime
+  dpkg-reconfigure --frontend noninteractive tzdata
 }
 
 function system_add_user {
