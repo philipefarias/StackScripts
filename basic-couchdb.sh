@@ -60,7 +60,6 @@ set_local_couchdb_port "$COUCH_PORT"
 set_local_couchdb_bind_address "$COUCH_BIND_ADDRESS"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
 set_local_couchdb_require_valid_user "true"
-touch /tmp/restart-couchdb
 
 # Monitoring tools
 install_monit "$ROOT_EMAIL"
@@ -75,8 +74,6 @@ configure_chkrootkit
 configure_rkhunter
 configure_logwatch
 configure_ufw "$SSHD_PORT" "$COUCH_PORT" "munin"
-
-restart_services
 
 # Send info message
 if [ -n "$ROOT_EMAIL" ]; then
@@ -105,3 +102,6 @@ root
 Linode VPS "$vps_hostname"
 EOD
 fi
+
+sleep 2
+reboot
