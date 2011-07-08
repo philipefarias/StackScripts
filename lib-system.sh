@@ -58,7 +58,7 @@ function configure_sshd {
   sshd_config_permitrootlogin "$SSHD_PERMITROOTLOGIN"
   sshd_config_passwordauthentication "$SSHD_PASSWORDAUTH"
   sshd_config_pubkeyauthentication "$SSHD_PUBKEYAUTH"
-  service ssh restart
+  touch /tmp/restart-ssh
 }
 
 function add_user_ssh_key {
@@ -114,7 +114,7 @@ function install_postfix {
   cat /etc/hostname > /etc/mailname
   newaliases
   sed -i "s/mydestination = localhost, localhost.localdomain, , localhost/mydestination = localhost, localhost.localdomain, $HOSTNAME/" /etc/postfix/main.cf
-  service postfix restart
+  touch /tmp/restart-postfix
 }
 
 # Monit and Munin
@@ -147,6 +147,7 @@ function install_monit {
 check filesystem rootfs with path /
 if space > 80% then alert
 EOT
+  touch /tmp/restart-monit
 }
 
 function install_munin_node {
@@ -155,7 +156,7 @@ function install_munin_node {
   apt-get -y install munin-node
   sed -i "s/^#host_name .*/host_name $1/" /etc/munin/munin-node.conf
   sed -i "s/^allow .*$/&\nallow \^$2\$/ ; /^allow \^\d*/ s/[.]/\\\&/g ; /^allow \^\d*/ s/\\\\\\\/\\\/g" /etc/munin/munin-node.conf
-  service munin-node restart
+  touch /tmp/restart-munin-node
 }
 
 # Security tools
@@ -210,4 +211,13 @@ function configure_ufw {
   done
 
   ufw enable
+}
+
+# Utility
+function restart_services {
+  # restarts services that have a file in /tmp/needs-restart/
+  for service in $(ls /tmp/restart-* | cut -d- -f2-10); do
+      service $service restart
+      rm -f /tmp/restart-$service
+  done
 }
