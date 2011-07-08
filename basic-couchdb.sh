@@ -65,25 +65,19 @@ set_local_couchdb_require_valid_user "true"
 install_monit "$ROOT_EMAIL"
 install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
 
-# Security tools
-apt-get -y install ufw fail2ban logcheck logcheck-database
-
 # Some good stuff
 apt-get -y install bash-completion less vim wget
 
-# Configure firewall
-ufw logging on
-ufw default deny
-
-ufw allow ${SSHD_PORT}
-ufw allow ${COUCH_PORT}
-ufw allow munin
-
-ufw enable
+# Security tools
+install_security_tools
+configure_chkrootkit
+configure_rkhunter
+configure_logwatch
+configure_ufw "$SSHD_PORT" "$COUCH_PORT" "munin"
 
 
 restartServices
-service couchdb start #somehow it don't happen on the restartServices
+service couchdb start # somehow the restartServices function don't do this
 
 
 # Send info message
