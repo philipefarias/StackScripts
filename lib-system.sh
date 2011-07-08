@@ -157,3 +157,57 @@ function install_munin_node {
   sed -i "s/^allow .*$/&\nallow \^$2\$/ ; /^allow \^\d*/ s/[.]/\\\&/g ; /^allow \^\d*/ s/\\\\\\\/\\\/g" /etc/munin/munin-node.conf
   service munin-node restart
 }
+
+# Security tools
+function install_security {
+  apt-get -y install chkrootkit rkhunter fail2ban logcheck logcheck-database logwatch ufw
+
+  cp /usr/share/logwatch/default.conf/logwatch.conf /etc/logwatch/conf/
+  rkhunter --propupd
+}
+
+function configure_chkrootkit {
+  CONF=/etc/chkrootkit.conf
+  test -f $CONF || exit 0
+
+  set_conf_value $CONF "RUN_DAILY" "\"true\""
+}
+
+function configure_rkhunter {
+  CONF=/etc/rkhunter.conf
+  test -f $CONF || exit 0
+
+  set_conf_value $CONF "MAIL-ON-WARNING" "\"root\""
+  sed -i "/ALLOWHIDDENDIR=\/dev\/.udev$/ s/^#//" $CONF
+  # Disabling tests for kernel modules, Linode kernel doens't have any modules loaded
+  sed -i "/^DISABLE_TESTS=.*/ s/\"$/ os_specific\"/" $CONF
+}
+
+function configure_logwatch {
+  CONF=/etc/logwatch/conf/logwatch.conf
+  test -f $CONF || exit 0
+
+  set_conf_value $CONF "Output" "mail"
+  set_conf_value $CONF "Format" "html"
+  set_conf_value $CONF "Detail" "Med"
+}
+
+function configure_ufw {
+  # $1, $2, $3... - ports to allow
+  ufw logging on
+  ufw default deny
+
+  while [ $# -gt 0 ]; do
+    ufw allow $1
+    shift
+  done
+
+  ufw enable
+}
+
+function set_conf_value {
+  # $1 - conf file
+  # $2 - key
+  # $3 - value
+  sed -i "s/^\($2[ ]*=[ ]*\).*/\1$3/" $1
+}
