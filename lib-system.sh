@@ -11,7 +11,7 @@ function lower {
     echo $1 | tr '[:upper:]' '[:lower:]'
 }
 
-function setup_hostname {
+function set_hostname {
   HOSTNAME=$1
   if [ -z "$HOSTNAME" ] ; then
     export HOSTNAME=get_rdns_primary_ip
