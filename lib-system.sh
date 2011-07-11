@@ -167,6 +167,8 @@ function install_security_tools {
   apt-get -y install chkrootkit rkhunter fail2ban logcheck logcheck-database logwatch ufw
 
   cp /usr/share/logwatch/default.conf/logwatch.conf /etc/logwatch/conf/
+  mkdir /var/cache/logwatch
+
   rkhunter --propupd
 }
 
