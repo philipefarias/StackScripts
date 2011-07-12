@@ -18,7 +18,7 @@ function set_hostname {
   fi
   HOST=`echo $HOSTNAME | sed 's/\(\[a-z0-9\]\)*\..*/\1/'`
   HOSTS_LINE="`system_primary_ip`\t$HOSTNAME\t$HOST"
-  echo "$HOST" >  /etc/hostname
+  echo "$HOST" > /etc/hostname
   sed -i "s/^127\.0\.0\.1 .*$/&\n$HOSTS_LINE/" /etc/hosts
   sed -i "s/^SET_HOSTNAME=.*/#&/" /etc/default/dhcpcd
   start hostname
@@ -194,6 +194,12 @@ function configure_rkhunter {
   sed -i "/ALLOWHIDDENDIR=\/dev\/.udev$/ s/^#//" $CONF
   # Disabling tests for kernel modules, Linode kernel doens't have any modules loaded
   sed -i "/^DISABLE_TESTS=.*/ s/\"$/ os_specific\"/" $CONF
+}
+
+function configure_logcheck {
+  # Stop the message flood about UFW blocking SYN packets
+  UFW_BLOCK_REGEX="^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[UFW BLOCK\] IN=[[:alnum:]]+ OUT= MAC=[:[:xdigit:]]+ SRC=[.[:digit:]]{7,15} DST=[.[:digit:]]{7,15} LEN=[[:digit:]]+ TOS=0x[[:xdigit:]]+ PREC=0x[[:xdigit:]]+ TTL=[[:digit:]]+ ID=[[:digit:]]+ (DF )?PROTO=TCP SPT=[[:digit:]]+ DPT=[[:digit:]]+ WINDOW=[[:digit:]]+ RES=0x[[:xdigit:]]+ SYN URGP=[[:digit:]]+$"
+  echo $UFW_BLOCK_REGEX >> /etc/logcheck/ignore.d.server/local
 }
 
 function configure_logwatch {
