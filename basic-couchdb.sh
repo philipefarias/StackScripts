@@ -72,6 +72,7 @@ apt-get -y install bash-completion less vim wget
 install_security_tools
 configure_chkrootkit
 configure_rkhunter
+configure_logcheck
 configure_logwatch
 configure_ufw "$SSHD_PORT" "$COUCH_PORT" "munin"
 

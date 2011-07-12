@@ -197,7 +197,7 @@ function configure_rkhunter {
 }
 
 function configure_logcheck {
-  # Stop the message flood about UFW blocking SYN packets
+  # Ignore the message flood about UFW blocking SYN packets
   UFW_BLOCK_REGEX="^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ kernel: \[UFW BLOCK\] IN=[[:alnum:]]+ OUT= MAC=[:[:xdigit:]]+ SRC=[.[:digit:]]{7,15} DST=[.[:digit:]]{7,15} LEN=[[:digit:]]+ TOS=0x[[:xdigit:]]+ PREC=0x[[:xdigit:]]+ TTL=[[:digit:]]+ ID=[[:digit:]]+ (DF )?PROTO=TCP SPT=[[:digit:]]+ DPT=[[:digit:]]+ WINDOW=[[:digit:]]+ RES=0x[[:xdigit:]]+ SYN URGP=[[:digit:]]+$"
   echo $UFW_BLOCK_REGEX >> /etc/logcheck/ignore.d.server/local
 }
