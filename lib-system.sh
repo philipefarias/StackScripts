@@ -164,7 +164,7 @@ function install_munin_node {
 
 # Security tools
 function install_security_tools {
-  apt-get -y install chkrootkit rkhunter fail2ban logcheck logcheck-database logwatch ufw
+  apt-get -y install cron-apt chkrootkit rkhunter fail2ban logcheck logcheck-database logwatch ufw
 
   cp /usr/share/logwatch/default.conf/logwatch.conf /etc/logwatch/conf/
   mkdir /var/cache/logwatch
@@ -177,6 +177,13 @@ function set_conf_value {
   # $2 - key
   # $3 - value
   sed -i "s/^\($2[ ]*=[ ]*\).*/\1$3/" $1
+}
+
+function configure_cronapt {
+  CONF=/etc/cron-apt/config
+  test -f $CONF || exit 0
+
+  sed -i "s/^# \(MAILON=\).*/\1\"changes\"/" $CONF
 }
 
 function configure_chkrootkit {

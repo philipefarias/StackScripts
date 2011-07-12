@@ -70,6 +70,7 @@ apt-get -y install bash-completion less vim wget
 
 # Security tools
 install_security_tools
+configure_cronapt
 configure_chkrootkit
 configure_rkhunter
 configure_logcheck
