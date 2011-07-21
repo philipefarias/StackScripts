@@ -191,6 +191,7 @@ function configure_chkrootkit {
   test -f $CONF || exit 0
 
   set_conf_value $CONF "RUN_DAILY" "\"true\""
+  set_conf_value $CONF "RUN_DAILY_OPTS" "\"-q -e '/usr/lib/pymodules/python2.7/.path'\""
 }
 
 function configure_rkhunter {
