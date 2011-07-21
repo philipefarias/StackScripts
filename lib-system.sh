@@ -218,12 +218,16 @@ function configure_logcheck {
   DHCPCD_ADDING_IP="^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ dhcpcd\[[[:digit:]]+\]: [[:alnum:]]+: adding IP address [.[:digit:]]{7,15}/[[:digit:]]+$"
   DHCPCD_ADDING_DEFAULT_ROUTE="^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ dhcpcd\[[[:digit:]]+\]: [[:alnum:]]+: adding default route via [.[:digit:]]{7,15} metric [0-9]+$"
   DHCPCD_INTERFACE_CONFIGURED="^\w{3} [ :[:digit:]]{11} [._[:alnum:]-]+ dhcpcd\.sh: interface [[:alnum:]]+ has been configured with old IP=[.[:digit:]]{7,15}$"
+  # Ignore ntpd messages
+  NTPD_VALIDATING_PEER="^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd\[[0-9]+\]: peer [.[:digit:]]{7,15} now (in)?valid$"
   echo "# DHCPCD messages" >> /etc/logcheck/ignore.d.server/local
   echo $DHCPCD_RENEWING >> /etc/logcheck/ignore.d.server/local
   echo $DHCPCD_LEASED >> /etc/logcheck/ignore.d.server/local
   echo $DHCPCD_ADDING_IP >> /etc/logcheck/ignore.d.server/local
   echo $DHCPCD_ADDING_DEFAULT_ROUTE >> /etc/logcheck/ignore.d.server/local
   echo $DHCPCD_INTERFACE_CONFIGURED >> /etc/logcheck/ignore.d.server/local
+  echo "# NTPD messages" >> /etc/logcheck/ignore.d.server/local
+  echo $NTPD_VALIDATING_PEER >> /etc/logcheck/ignore.d.server/local
 }
 
 function configure_logwatch {
