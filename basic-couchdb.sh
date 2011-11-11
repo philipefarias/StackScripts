@@ -29,7 +29,7 @@ set_hostname "$HOSTNAME"
 set_timezone "$TIMEZONE"
 
 # Create user account
-USER_GROUPS="admin"
+USER_GROUPS="sudo"
 system_add_user "$USER_NAME" "$USER_PASSWORD" "$USER_GROUPS"
 if [ "$USER_SSHKEY" ]; then
     add_user_ssh_key "$USER_NAME" "$USER_SSHKEY"
@@ -46,20 +46,23 @@ install_postfix "$ROOT_EMAIL" "$USER_NAME"
 
 # Install CouchDB
 source <ssinclude StackScriptID="2847">
-COUCH_VERSION="1.1.0"
+COUCH_VERSION="1.1.1"
 COUCH_BIND_ADDRESS="0.0.0.0"
 COUCH_PORT="5984"
 COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
-curl http://${COUCH_MIRROR}/couchdb/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
+COUCH_PREFIX="/usr/local"
 apt-get -y install curl build-essential
+cd /opt
+curl http://${COUCH_MIRROR}/couchdb/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
+cd -
 
-build_spidermonkey
-build_couchdb "apache-couchdb-${COUCH_VERSION}"
+#build_spidermonkey
+build_couchdb "/opt/apache-couchdb-${COUCH_VERSION}" "$COUCH_PREFIX"
 
-set_local_couchdb_port "$COUCH_PORT"
-set_local_couchdb_bind_address "$COUCH_BIND_ADDRESS"
+set_local_couchdb_port "$COUCH_PORT" "$COUCH_PREFIX"
+set_local_couchdb_bind_address "$COUCH_BIND_ADDRESS" "$COUCH_PREFIX"
 set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
-set_local_couchdb_require_valid_user "true"
+set_local_couchdb_require_valid_user "true" "$COUCH_PREFIX"
 
 # Monitoring tools
 install_monit "$ROOT_EMAIL"

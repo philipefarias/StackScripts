@@ -20,7 +20,6 @@ function set_hostname {
   HOSTS_LINE="`system_primary_ip`\t$HOSTNAME\t$HOST"
   echo "$HOST" > /etc/hostname
   sed -i "s/^127\.0\.0\.1 .*$/&\n$HOSTS_LINE/" /etc/hosts
-  sed -i "s/^SET_HOSTNAME=.*/#&/" /etc/default/dhcpcd
   start hostname
 }
 

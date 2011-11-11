@@ -13,18 +13,18 @@
 
 ## Download and build SpiderMonkey from source
 function build_spidermonkey {
-  curl http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz | tar zxv
-  cd js/src
+  curl http://ftp.mozilla.org/pub/mozilla.org/js/js185-1.0.0.tar.gz | tar zxv
+  cd js-1.8.5/js/src
   make BUILD_OPT=1 -f Makefile.ref
   make BUILD_OPT=1 JS_DIST=/usr/local -f Makefile.ref export
   cd -
 }
 
-## Install CouchDB dependecies besides SpiderMonkey then build CouchDB
+## Install CouchDB dependecies then build CouchDB
 function build_couchdb {
   # $1 - path to couchdb source
   # $2 - installation tree prefix
-  apt-get -y install libicu-dev libcurl4-gnutls-dev libtool erlang-dev erlang
+  apt-get -y install libmozjs-dev libicu-dev libcurl4-gnutls-dev libtool erlang-dev erlang
 
   couch_prefix=$2
 
@@ -47,6 +47,14 @@ function build_couchdb {
   chmod 664 ${couch_prefix}/etc/couchdb/*.ini
   chmod 775 ${couch_prefix}/etc/couchdb/*.d
 
+  if [ -n "$couch_prefix" -a "$couch_prefix" != "/" ]
+  then
+    # Configure logrotate
+    ln -s ${couch_prefix}/etc/logrotate.d/couchdb /etc/logrotate.d/couchdb
+    # Configure the init script
+    ln -sf ${couch_prefix}/etc/init.d/couchdb /etc/init.d/couchdb
+  fi
+
   # Start couchdb
   service couchdb start
   # Start couchdb on system start
@@ -55,7 +63,7 @@ function build_couchdb {
   # Verify couchdb is running
   sleep 2 # must wait a little...
   curl http://127.0.0.1:5984/
-  # {"couchdb":"Welcome","version":"1.1.0"}
+  # {"couchdb":"Welcome","version":"1.1.1"}
 }
 
 function set_local_couchdb_port {
