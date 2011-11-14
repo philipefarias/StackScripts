@@ -14,12 +14,12 @@ function lower {
 function set_hostname {
   HOSTNAME=$1
   if [ -z "$HOSTNAME" ] ; then
-    export HOSTNAME=get_rdns_primary_ip
+    export HOSTNAME="`get_rdns_primary_ip`"
   fi
   HOST=`echo $HOSTNAME | sed 's/\(\[a-z0-9\]\)*\..*/\1/'`
   HOSTS_LINE="`system_primary_ip`\t$HOSTNAME\t$HOST"
   echo "$HOST" > /etc/hostname
-  sed -i "s/^127\.0\.0\.1 .*$/&\n$HOSTS_LINE/" /etc/hosts
+  sed -i "s/^127\.0\.1\.1\s.*$/$HOSTS_LINE/" /etc/hosts
   start hostname
 }
 
@@ -190,7 +190,7 @@ function configure_chkrootkit {
   test -f $CONF || exit 0
 
   set_conf_value $CONF "RUN_DAILY" "\"true\""
-  set_conf_value $CONF "RUN_DAILY_OPTS" "\"-q -e '/usr/lib/pymodules/python2.7/.path'\""
+  set_conf_value $CONF "RUN_DAILY_OPTS" "\"-q -e '/usr/lib/jvm/.java-1.6.0-openjdk.jinfo /usr/lib/byobu/.constants /usr/lib/byobu/.dirs /usr/lib/byobu/.shutil /usr/lib/byobu/.notify_osd /usr/lib/byobu/.common /usr/lib/pymodules/python2.7/.path'\""
 }
 
 function configure_rkhunter {

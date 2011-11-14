@@ -9,7 +9,7 @@
 # <udf name="user_sshkey" label="Public Key for User" default="" />
 #
 # <udf name="sshd_port" label="SSH Port" default="22" />
-# <udf name="hostname" label="System Hostname" default="myvps" example="Name of your server, i.e. linode1" />
+# <udf name="hostname" label="System Hostname" default="" example="Name of your server, i.e. linode1. Leave it blank to use Linode reverse DNS." />
 # <udf name="timezone" label="System Timezone" default="" example="Zoneinfo file on the server, i.e. America/Sao_Paulo" />
 # <udf name="root_email" label="Root Email" />
 #
@@ -108,5 +108,4 @@ Linode VPS "$vps_hostname"
 EOD
 fi
 
-sleep 2
-reboot
+restart_services
