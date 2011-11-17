@@ -23,6 +23,9 @@ source <ssinclude StackScriptID="1">
 source <ssinclude StackScriptID="2865"> # lib-system
 
 system_update
+
+fix_page_allocation_error
+
 update_locale_en_US_UTF_8
 
 set_hostname "$HOSTNAME"

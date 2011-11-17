@@ -259,3 +259,14 @@ function restart_services {
       rm -f /tmp/restart-$service
   done
 }
+
+function fix_page_allocation_error {
+  sysctl vm.min_free_kbytes=16384
+  cat << EOT > /etc/sysctl.conf
+
+###################################################################
+# Fix for page allocation failure
+vm.min_free_kbytes = 16384
+EOT
+  touch /tmp/restart-rsyslog
+}
