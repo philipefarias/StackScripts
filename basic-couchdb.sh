@@ -54,7 +54,7 @@ COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
 COUCH_PREFIX="/usr/local"
 apt-get -y install curl build-essential
 cd /opt
-curl http://${COUCH_MIRROR}/couchdb/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
+curl http://${COUCH_MIRROR}/couchdb/releases/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
 cd -
 
 #build_spidermonkey
