@@ -25,6 +25,7 @@ function build_couchdb {
   # $1 - path to couchdb source
   # $2 - installation tree prefix
   apt-get -y build-dep couchdb
+  apt-get -y install libmozjs-dev libicu-dev libcurl4-gnutls-dev libtool
 
   couch_prefix=$2
 
