@@ -30,6 +30,7 @@ function build_couchdb {
 
   cd $1
   ./configure --prefix=${couch_prefix}
+  make check
   make && make install
   cd -
 
