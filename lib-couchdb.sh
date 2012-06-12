@@ -24,8 +24,7 @@ function build_spidermonkey {
 function build_couchdb {
   # $1 - path to couchdb source
   # $2 - installation tree prefix
-  apt-get -y build-dep couchdb
-  apt-get -y install libmozjs-dev libicu-dev libcurl4-gnutls-dev libtool
+  apt-get -y install build-essential autoconf automake libtool erlang libicu-dev libmozjs-dev libcurl4-openssl-dev
 
   couch_prefix=$2
 
