@@ -13,7 +13,7 @@
 # <udf name="timezone" label="System Timezone" default="" example="Zoneinfo file on the server, i.e. America/Sao_Paulo" />
 # <udf name="root_email" label="Root Email" />
 #
-# <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
+# <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache/couchdb/releases" example="Paste the url till the couchdb folder." />
 # <udf name="couch_user" label="CouchDB Admin User" default="admin" />
 # <udf name="couch_password" label="CouchDB Admin Password" />
 
@@ -54,7 +54,7 @@ COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
 COUCH_PREFIX="/usr/local"
 apt-get -y install curl build-essential
 cd /opt
-curl http://${COUCH_MIRROR}/couchdb/releases/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
+curl http://${COUCH_MIRROR}/${COUCH_VERSION}/apache-couchdb-${COUCH_VERSION}.tar.gz | tar zxv
 cd -
 
 #build_spidermonkey
