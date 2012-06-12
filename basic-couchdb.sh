@@ -13,8 +13,6 @@
 # <udf name="timezone" label="System Timezone" default="" example="Zoneinfo file on the server, i.e. America/Sao_Paulo" />
 # <udf name="root_email" label="Root Email" />
 #
-# <udf name="munin_server_ip" label="Munin Server IP" default="127.0.0.1" />
-#
 # <udf name="couch_mirror" label="Apache CouchDB Package Mirror" default="mirror.atlanticmetro.net/apache" example="Paste the url till the couchdb folder." />
 # <udf name="couch_user" label="CouchDB Admin User" default="admin" />
 # <udf name="couch_password" label="CouchDB Admin Password" />
@@ -24,7 +22,7 @@ source <ssinclude StackScriptID="2865"> # lib-system
 
 system_update
 
-fix_page_allocation_error
+#fix_page_allocation_error
 
 update_locale_en_US_UTF_8
 
@@ -49,7 +47,7 @@ install_postfix "$ROOT_EMAIL" "$USER_NAME"
 
 # Install CouchDB
 source <ssinclude StackScriptID="2847">
-COUCH_VERSION="1.1.1"
+COUCH_VERSION="1.2.0"
 COUCH_BIND_ADDRESS="0.0.0.0"
 COUCH_PORT="5984"
 COUCH_HOST="http://$COUCH_BIND_ADDRESS:$COUCH_PORT"
@@ -68,20 +66,16 @@ set_couchdb_admin_user "$COUCH_HOST" "$COUCH_USER" "$COUCH_PASSWORD"
 set_local_couchdb_require_valid_user "true" "$COUCH_PREFIX"
 
 # Monitoring tools
-install_monit "$ROOT_EMAIL"
-install_munin_node "$HOSTNAME" "$MUNIN_SERVER_IP"
+#install_monit "$ROOT_EMAIL"
 
 # Some good stuff
 apt-get -y install bash-completion less vim wget
 
 # Security tools
 install_security_tools
-configure_cronapt
 configure_chkrootkit
 configure_rkhunter
-configure_logcheck
-configure_logwatch
-configure_ufw "$SSHD_PORT" "$COUCH_PORT" "munin"
+configure_ufw "$SSHD_PORT" "$COUCH_PORT"
 
 # Send info message
 if [ -n "$ROOT_EMAIL" ]; then

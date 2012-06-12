@@ -163,10 +163,7 @@ function install_munin_node {
 
 # Security tools
 function install_security_tools {
-  apt-get -y install cron-apt chkrootkit rkhunter fail2ban logcheck logcheck-database logwatch ufw
-
-  cp /usr/share/logwatch/default.conf/logwatch.conf /etc/logwatch/conf/
-  mkdir /var/cache/logwatch
+  apt-get -y install unattended-upgrades chkrootkit rkhunter fail2ban ufw
 
   rkhunter --propupd
 }
