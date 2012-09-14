@@ -24,9 +24,9 @@ function set_hostname {
 }
 
 function update_locale_en_US_UTF_8 {
-  # locale-gen en_US.UTF-8
   dpkg-reconfigure locales
   update-locale LANG=en_US.UTF-8
+  locale-gen en_US.UTF-8
 }
 
 function set_timezone {
