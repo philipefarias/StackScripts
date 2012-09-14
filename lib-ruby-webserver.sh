@@ -16,12 +16,20 @@ function install_nginx {
 function configure_ruby_environment_for_user {
   # $1 - username
   # $2 - ruby version/type
+  USERNAME=$1
+  RUBY_VERSION=$2
+
   apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion pkg-config
 
   # Install RVM and Ruby
-  su $1 -l -c "curl -L get.rvm.io | sudo bash -s stable" # multi-user install
-  command rvm install "$2"
-  command rvm "$2" --default
+  su $USERNAME -l -c "curl -L get.rvm.io" | bash -s stable # multi-user install
+
+  # Following steps for RVM multi-user install
+  # Add user to rvm group
+  usermod -a -G rvm $USERNAME
+
+  su $USERNAME -l -c "command rvm install $RUBY_VERSION"
+  su $USERNAME -l -c "command rvm $RUBY_VERSION --default"
 
   GEMRC=<<EOD
 ---
@@ -29,11 +37,7 @@ install: --no-rdoc --no-ri
 update: --no-rdoc --no-ri
 EOD
 
-  su $1 -l -c "echo '$GEMRC' >> ~/.gemrc"
-
-  # Following steps for RVM multi-user install
-  # Add user to rvm group
-  usermod -a -G rvm $1
+  su $USERNAME -l -c "echo '$GEMRC' >> ~/.gemrc"
 }
 
 function configure_ruby_webapp {
