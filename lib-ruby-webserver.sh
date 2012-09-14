@@ -57,10 +57,7 @@ function configure_ruby_webapp {
   mkdir -p "$GIT_PATH"
   chown -R $USERNAME:$USERNAME "$DEPLOY_PATH" "$GIT_PATH"
 
-  cd "$GIT_PATH"
-  su $1 -l -c "git init --bare"
-  su $1 -l -c "touch hooks/post-receive"
-  cd -
+  su $1 -l -c "cd '$GIT_PATH'; git init --bare; touch hooks/post-receive"
   configure_git_post_receive_hook "$APP_NAME" "$APP_URL" "$GIT_PATH" "$DEPLOY_PATH"
 
   configure_nginx "$APP_NAME" "$APP_URL" "$DEPLOY_PATH"
