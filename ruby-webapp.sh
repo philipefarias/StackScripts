@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Config a web server for Ruby apps
+# Config a web server for Ruby apps with NGINX
 #
 # Author: Philipe Farias <philipefarias@gmail.com>
 #
@@ -19,6 +19,7 @@
 
 source <ssinclude StackScriptID="1">
 source <ssinclude StackScriptID="2865"> # lib-system
+source <ssinclude StackScriptID="5310"> # lib-ruby-webserver
 
 system_update
 

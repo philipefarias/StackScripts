@@ -5,13 +5,6 @@
 # Author: Philipe Farias <philipefarias@gmail.com>
 
 ## Install nginx stable from ppa
-function login_as {
-  # $1 - username to login as
-  if [ "$1" != "$LOGNAME" ]; then
-    su "$1" -l
-  fi
-}
-
 function install_nginx {
   apt-get -y install python-software-properties
   add-apt-repository -y ppa:nginx/stable
@@ -25,12 +18,8 @@ function configure_ruby_environment_for_user {
   # $2 - ruby version/type
   apt-get -y install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion pkg-config
 
-  login_as "$1"
-
   # Install RVM and Ruby
-  echo 'rvm_path="$HOME/.rvm"' >> ~/.rvmrc
-  curl -L get.rvm.io | sudo bash -s stable # multi-user install
-  source "$HOME/.rvm/scripts/rvm"
+  su $1 -l -c "curl -L get.rvm.io | sudo bash -s stable" # multi-user install
   command rvm install "$2"
   command rvm "$2" --default
 
@@ -40,10 +29,7 @@ install: --no-rdoc --no-ri
 update: --no-rdoc --no-ri
 EOD
 
-  echo "$GEMRC" >> ~/.gemrc
-
-  # Logout to root
-  logout
+  su $1 -l -c "echo '$GEMRC' >> ~/.gemrc"
 
   # Following steps for RVM multi-user install
   # Add user to rvm group
@@ -63,20 +49,15 @@ function configure_ruby_webapp {
 
   configure_ruby_environment_for_user "$USERNAME" "$4"
 
-  mkdir -p $DEPLOY_PATH
-  chown $USERNAME:$USERNAME $DEPLOY_PATH
-
-  login_as "$USERNAME"
-
+  mkdir -p "$DEPLOY_PATH"
   mkdir -p "$GIT_PATH"
+  chown -R $USERNAME:$USERNAME "$DEPLOY_PATH" "$GIT_PATH"
+
   cd "$GIT_PATH"
-  git init --bare
+  su $1 -l -c "git init --bare"
+  su $1 -l -c "touch hooks/post-receive"
   cd -
-
   configure_git_post_receive_hook "$APP_NAME" "$APP_URL" "$GIT_PATH" "$DEPLOY_PATH"
-
-  # Logout to root
-  logout
 
   configure_nginx "$APP_NAME" "$APP_URL" "$DEPLOY_PATH"
 }
