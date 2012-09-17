@@ -29,7 +29,8 @@ function configure_ruby_environment_for_user {
   usermod -a -G rvm $USERNAME
 
   su $USERNAME -l -c "command rvm install $RUBY_VERSION"
-  su $USERNAME -l -c "echo 'Changing Ruby'; command rvm $RUBY_VERSION --default"
+  # Loading RVM before using the Ruby installed
+  su $USERNAME -l -c "source /etc/profile; type rvm | head -n 1; command rvm $RUBY_VERSION --default"
 
   su $USERNAME -l -c "cat >~/.gemrc <<EOD
 ---
@@ -123,20 +124,20 @@ function configure_nginx {
   rm "/etc/nginx/sites-enabled/default"
   cat >"/etc/nginx/sites-available/$APP_NAME.conf" <<EOD
 upstream $APP_NAME {
-server unix:/var/run/$APP_NAME.sock fail_timeout=0;
+  server unix:/var/run/$APP_NAME.sock fail_timeout=0;
 }
 
 server {
-listen 80;
-server_name $APP_URL;
-root $DEPLOY_PATH/public;
-try_files \$uri/index.html \$uri @$APP_URL;
-location / {
-  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-  proxy_set_header Host \$http_host;
-  proxy_pass http://$APP_NAME;
-}
-error_page 500 502 503 504 /500.html;
+  listen 80;
+  server_name $APP_URL;
+  root $DEPLOY_PATH/public;
+  try_files \$uri/index.html \$uri @$APP_URL;
+  location / {
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header Host \$http_host;
+    proxy_pass http://$APP_NAME;
+  }
+  error_page 500 502 503 504 /500.html;
 }
 EOD
 
