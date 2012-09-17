@@ -19,14 +19,15 @@ function set_hostname {
   HOST=`echo $HOSTNAME | sed 's/\(\[a-z0-9\]\)*\..*/\1/'`
   HOSTS_LINE="`system_primary_ip`\t$HOSTNAME\t$HOST"
   echo "$HOST" > /etc/hostname
-  sed -i "s/^127\.0\.1\.1\s.*$/$HOSTS_LINE/" /etc/hosts
+  sed -i -e "s/^127\.0\.1\.1\s.*$/$HOSTS_LINE/" /etc/hosts
   start hostname
 }
 
 function update_locale_en_US_UTF_8 {
+  #locale-gen en_US.UTF-8
   dpkg-reconfigure locales
-  update-locale LANG=en_US.UTF-8
-  locale-gen en_US.UTF-8
+  update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+  echo "LC_ALL=en_US.UTF-8" >> /etc/environment
 }
 
 function set_timezone {
@@ -75,7 +76,7 @@ function add_user_ssh_key {
 }
 
 function sshd_config_set_port {
-  sed -i "s/Port 22/Port $1/" /etc/ssh/sshd_config
+  sed -i -e "s/Port 22/Port $1/" /etc/ssh/sshd_config
 }
 
 function sshd_config_edit_bool {
@@ -83,7 +84,7 @@ function sshd_config_edit_bool {
     # $2 - Yes/No
     VALUE=`lower $2`
     if [ "$VALUE" == "yes" ] || [ "$VALUE" == "no" ]; then
-        sed -i "s/^#*\($1\).*/\1 $VALUE/" /etc/ssh/sshd_config
+        sed -i -e "s/^#*\($1\).*/\1 $VALUE/" /etc/ssh/sshd_config
     fi
 }
 
@@ -115,7 +116,7 @@ function install_postfix {
   echo "$2: root" >> /etc/aliases
   cat /etc/hostname > /etc/mailname
   newaliases
-  sed -i "s/mydestination = localhost, localhost.localdomain, , localhost/mydestination = localhost, localhost.localdomain, $HOSTNAME/" /etc/postfix/main.cf
+  sed -i -e "s/mydestination = localhost, localhost.localdomain, , localhost/mydestination = localhost, localhost.localdomain, $HOSTNAME/" /etc/postfix/main.cf
   touch /tmp/restart-postfix
 }
 
@@ -123,20 +124,20 @@ function install_postfix {
 function install_monit {
   # $1 - root email
   apt-get -y install monit
-  sed -i 's/startup=0/startup=1/' /etc/default/monit
+  sed -i -e 's/startup=0/startup=1/' /etc/default/monit
   mkdir -p /etc/monit/conf.d/
-  sed -i "s/# set daemon  120/set daemon 120/" /etc/monit/monitrc
-  sed -i "s/#     with start delay 240/with start delay 240/" /etc/monit/monitrc
-  sed -i "s/# set logfile syslog facility log_daemon/set logfile \/var\/log\/monit.log/" /etc/monit/monitrc
-  sed -i "s/# set mailserver mail.bar.baz,/set mailserver localhost/" /etc/monit/monitrc
-  sed -i "s/# set eventqueue/set eventqueue/" /etc/monit/monitrc
-  sed -i "s/#     basedir \/var\/monit/basedir \/var\/monit/" /etc/monit/monitrc
-  sed -i "s/#     slots 100 /slots 100/" /etc/monit/monitrc
-  sed -i "s/# set alert sysadm@foo.bar/set alert $1 reminder 180/" /etc/monit/monitrc
-  sed -i "s/# set httpd port 2812 and/ set httpd port 2812 and/" /etc/monit/monitrc
-  sed -i "s/#     use address localhost/use address localhost/" /etc/monit/monitrc
-  sed -i "s/#     allow localhost/allow localhost/" /etc/monit/monitrc
-  sed -i "s/# set mail-format { from: monit@foo.bar }/set mail-format { from: monit@`hostname -f` }/" /etc/monit/monitrc
+  sed -i -e "s/# set daemon  120/set daemon 120/" /etc/monit/monitrc
+  sed -i -e "s/#     with start delay 240/with start delay 240/" /etc/monit/monitrc
+  sed -i -e "s/# set logfile syslog facility log_daemon/set logfile \/var\/log\/monit.log/" /etc/monit/monitrc
+  sed -i -e "s/# set mailserver mail.bar.baz,/set mailserver localhost/" /etc/monit/monitrc
+  sed -i -e "s/# set eventqueue/set eventqueue/" /etc/monit/monitrc
+  sed -i -e "s/#     basedir \/var\/monit/basedir \/var\/monit/" /etc/monit/monitrc
+  sed -i -e "s/#     slots 100 /slots 100/" /etc/monit/monitrc
+  sed -i -e "s/# set alert sysadm@foo.bar/set alert $1 reminder 180/" /etc/monit/monitrc
+  sed -i -e "s/# set httpd port 2812 and/ set httpd port 2812 and/" /etc/monit/monitrc
+  sed -i -e "s/#     use address localhost/use address localhost/" /etc/monit/monitrc
+  sed -i -e "s/#     allow localhost/allow localhost/" /etc/monit/monitrc
+  sed -i -e "s/# set mail-format { from: monit@foo.bar }/set mail-format { from: monit@`hostname -f` }/" /etc/monit/monitrc
   cat << EOT > /etc/monit/conf.d/system
   check system `hostname`
     if loadavg (1min) > 4 then alert
@@ -156,8 +157,8 @@ function install_munin_node {
   # $1 - node hostname
   # $2 - munin server ip
   apt-get -y install munin-node
-  sed -i "s/^#host_name .*/host_name $1/" /etc/munin/munin-node.conf
-  sed -i "s/^allow .*$/&\nallow \^$2\$/ ; /^allow \^\d*/ s/[.]/\\\&/g ; /^allow \^\d*/ s/\\\\\\\/\\\/g" /etc/munin/munin-node.conf
+  sed -i -e "s/^#host_name .*/host_name $1/" /etc/munin/munin-node.conf
+  sed -i -e "s/^allow .*$/&\nallow \^$2\$/ ; /^allow \^\d*/ s/[.]/\\\&/g ; /^allow \^\d*/ s/\\\\\\\/\\\/g" /etc/munin/munin-node.conf
   touch /tmp/restart-munin-node
 }
 
@@ -172,14 +173,14 @@ function set_conf_value {
   # $1 - conf file
   # $2 - key
   # $3 - value
-  sed -i "s/^\($2[ ]*=[ ]*\).*/\1$3/" $1
+  sed -i -e "s/^\($2[ ]*=[ ]*\).*/\1$3/" $1
 }
 
 function configure_cronapt {
   CONF=/etc/cron-apt/config
   test -f $CONF || exit 0
 
-  sed -i "s/^# \(MAILON=\).*/\1\"changes\"/" $CONF
+  sed -i -e "s/^# \(MAILON=\).*/\1\"changes\"/" $CONF
 }
 
 function configure_chkrootkit {
@@ -195,9 +196,9 @@ function configure_rkhunter {
   test -f $CONF || exit 0
 
   set_conf_value $CONF "MAIL-ON-WARNING" "\"root\""
-  sed -i "/ALLOWHIDDENDIR=\/dev\/.udev$/ s/^#//" $CONF
+  sed -i -e "/ALLOWHIDDENDIR=\/dev\/.udev$/ s/^#//" $CONF
   # Disabling tests for kernel modules, Linode kernel doens't have any modules loaded
-  sed -i "/^DISABLE_TESTS=.*/ s/\"$/ os_specific\"/" $CONF
+  sed -i -e "/^DISABLE_TESTS=.*/ s/\"$/ os_specific\"/" $CONF
 }
 
 function configure_logcheck {
