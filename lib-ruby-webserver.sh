@@ -29,15 +29,13 @@ function configure_ruby_environment_for_user {
   usermod -a -G rvm $USERNAME
 
   su $USERNAME -l -c "command rvm install $RUBY_VERSION"
-  su $USERNAME -l -c "command rvm $RUBY_VERSION --default"
+  su $USERNAME -l -c "echo 'Changing Ruby'; command rvm $RUBY_VERSION --default"
 
-  GEMRC=<<EOD
+  su $USERNAME -l -c "cat >~/.gemrc <<EOD
 ---
 install: --no-rdoc --no-ri
 update: --no-rdoc --no-ri
-EOD
-
-  su $USERNAME -l -c "echo '$GEMRC' >> ~/.gemrc"
+EOD"
 }
 
 function configure_ruby_webapp {
@@ -73,7 +71,7 @@ function configure_git_post_receive_hook {
   GIT_PATH=$3
   DEPLOY_PATH=$4
 
-  GIT_POST_RECEIVE_HOOK=<<EOD
+  cat >"$GIT_PATH/hooks/post-receive" <<EOD
 #!/bin/sh
 
 message() {
@@ -111,7 +109,6 @@ bundle install --deployment || exit_with_error
 cd -
 EOD
 
-  echo "$GIT_POST_RECEIVE_HOOK" >> "$GIT_PATH/hooks/post-receive"
   chmod +x "$GIT_PATH/hooks/post-receive"
 }
 
@@ -123,7 +120,8 @@ function configure_nginx {
   APP_URL=$2
   DEPLOY_PATH=$3
 
-  NGINX_SITE_CONF=<<EOD
+  rm "/etc/nginx/sites-enabled/default"
+  cat >"/etc/nginx/sites-available/$APP_NAME.conf" <<EOD
 upstream $APP_NAME {
 server unix:/var/run/$APP_NAME.sock fail_timeout=0;
 }
@@ -142,8 +140,6 @@ error_page 500 502 503 504 /500.html;
 }
 EOD
 
-  rm "/etc/nginx/sites-enabled/default"
-  echo "$NGINX_SITE_CONF" >> "/etc/nginx/sites-available/$APP_NAME.conf"
   cd "/etc/nginx/sites-enabled"
   ln -fs "/etc/nginx/sites-available/$APP_NAME.conf" "."
 }
