@@ -28,9 +28,7 @@ function configure_ruby_environment_for_user {
   # Add user to rvm group
   usermod -a -G rvm $USERNAME
 
-  su $USERNAME -l -c "command rvm install $RUBY_VERSION"
-  # Loading RVM before using the Ruby installed
-  su $USERNAME -l -c "source /etc/profile; type rvm | head -n 1; command rvm $RUBY_VERSION --default"
+  su $USERNAME -l -c "rvm install $RUBY_VERSION ; rvm $RUBY_VERSION --default"
 
   su $USERNAME -l -c "cat >~/.gemrc <<EOD
 ---
