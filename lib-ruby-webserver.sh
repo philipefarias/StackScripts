@@ -71,17 +71,19 @@ function configure_git_post_receive_hook {
   DEPLOY_PATH=$4
 
   cat >"$GIT_PATH/hooks/post-receive" <<EOD
-#!/bin/sh
+#!/bin/bash
 
 message() {
-echo "-----> \$1"
+  echo "-----> \$1"
 }
 
 exit_with_error() {
-message "An error has occurred!!!"
-exit 1
+  message "An error has occurred!"
+  echo
+  exit 1
 }
 
+echo
 message "Preparing to deploy"
 
 APP_NAME="$APP_NAME"
@@ -89,13 +91,13 @@ export RACK_ENV="production"
 
 \# Load RVM into a shell session *as a function*
 if [[ -s "\$HOME/.rvm/scripts/rvm" ]] ; then
-\# First try to load from a user install
-source "\$HOME/.rvm/scripts/rvm"
+  \# First try to load from a user install
+  source "\$HOME/.rvm/scripts/rvm"
 elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
-\# Then try to load from a root install
-source "/usr/local/rvm/scripts/rvm"
+  \# Then try to load from a root install
+  source "/usr/local/rvm/scripts/rvm"
 else
-printf "ERROR: An RVM installation was not found.\n"
+  printf "ERROR: An RVM installation was not found.\n" && exit_with_error
 fi
 
 message "Deploying $APP_NAME"
@@ -106,6 +108,8 @@ cd "\$GIT_WORK_TREE"
 rvm default || exit_with_error
 bundle install --deployment || exit_with_error
 cd -
+
+echo
 EOD
 
   chmod +x "$GIT_PATH/hooks/post-receive"
