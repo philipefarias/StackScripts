@@ -89,12 +89,12 @@ message "Preparing to deploy"
 APP_NAME="$APP_NAME"
 export RACK_ENV="production"
 
-\# Load RVM into a shell session *as a function*
+# Load RVM into a shell session *as a function*
 if [[ -s "\$HOME/.rvm/scripts/rvm" ]] ; then
-  \# First try to load from a user install
+  # First try to load from a user install
   source "\$HOME/.rvm/scripts/rvm"
 elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
-  \# Then try to load from a root install
+  # Then try to load from a root install
   source "/usr/local/rvm/scripts/rvm"
 else
   printf "ERROR: An RVM installation was not found.\n" && exit_with_error
@@ -106,7 +106,7 @@ GIT_WORK_TREE="$DEPLOY_PATH" git checkout -f
 
 cd "\$GIT_WORK_TREE"
 rvm default || exit_with_error
-bundle install --deployment || exit_with_error
+bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment || exit_with_error
 cd -
 
 echo
