@@ -46,6 +46,12 @@ function system_add_user {
   SHELL="/bin/bash"
   useradd --create-home --shell "$SHELL" --user-group --groups "$SUDO_GROUP" "$USERNAME"
   echo "$USERNAME:$PASSWORD" | chpasswd
+
+  cat >"/etc/sudoers.d/$USERNAME" <<EOD
+# Don't ask password for $USERNAME when using sudo
+$USERNAME ALL=NOPASSWD: ALL
+EOD
+
   #lock out root
   passwd -l root
 }
