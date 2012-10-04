@@ -51,6 +51,7 @@ function system_add_user {
 # Don't ask password for $USERNAME when using sudo
 $USERNAME ALL=NOPASSWD: ALL
 EOD
+  chmod 0440 "/etc/sudoers.d/$USERNAME"
 
   #lock out root
   passwd -l root
