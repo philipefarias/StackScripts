@@ -55,60 +55,71 @@ function configure_ruby_webapp {
   chown -R $USERNAME:$USERNAME "$DEPLOY_PATH" "$GIT_PATH"
 
   su $1 -l -c "cd '$GIT_PATH'; git init --bare; touch hooks/post-receive"
-  configure_git_post_receive_hook "$APP_NAME" "$APP_URL" "$GIT_PATH" "$DEPLOY_PATH"
+  configure_git_post_receive_hook "$APP_NAME" "$GIT_PATH" "$DEPLOY_PATH"
 
   configure_nginx "$APP_NAME" "$APP_URL" "$DEPLOY_PATH"
 }
 
 function configure_git_post_receive_hook {
   # $1 - app name
-  # $2 - app url
-  # $3 - git path
-  # $4 - deploy path
+  # $2 - git path
+  # $3 - deploy path
   APP_NAME=$1
-  APP_URL=$2
-  GIT_PATH=$3
-  DEPLOY_PATH=$4
+  GIT_PATH=$2
+  DEPLOY_PATH=$3
 
   cat >"$GIT_PATH/hooks/post-receive" <<EOD
 #!/bin/bash
 
 message() {
-  echo "-----> \$1"
+    echo "-----> \$1"
 }
 
 exit_with_error() {
-  message "An error has occurred!"
-  echo
-  exit 1
+    message "An error has occurred!!!"
+    echo
+    exit 1
 }
 
 echo
 message "Preparing to deploy"
 
-APP_NAME="$APP_NAME"
-export RACK_ENV="production"
-
 # Load RVM into a shell session *as a function*
 if [[ -s "\$HOME/.rvm/scripts/rvm" ]] ; then
-  # First try to load from a user install
-  source "\$HOME/.rvm/scripts/rvm"
+    # First try to load from a user install
+    source "\$HOME/.rvm/scripts/rvm"
 elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
-  # Then try to load from a root install
-  source "/usr/local/rvm/scripts/rvm"
+    # Then try to load from a root install
+    source "/usr/local/rvm/scripts/rvm"
 else
-  printf "ERROR: An RVM installation was not found.\n" && exit_with_error
+    printf "ERROR: An RVM installation was not found.\\n" && exit_with_error
 fi
-
-message "Deploying $APP_NAME"
-
-GIT_WORK_TREE="$DEPLOY_PATH" git checkout -f
-
-cd "\$GIT_WORK_TREE"
 rvm default || exit_with_error
-bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment || exit_with_error
-cd -
 
+export RACK_ENV="production"
+
+APP_NAME="$APP_NAME"
+DEPLOY_PATH="$DEPLOY_PATH"
+GIT_VERSION=\$(git --version | cut -d ' ' -f 3)
+RVM_VERSION=\$(rvm --version | grep "rvm" | tr -s ' ' | cut -d ' ' -f 2,3)
+
+message "Checking out files to \$DEPLOY_PATH with git \$GIT_VERSION"
+GIT_WORK_TREE="\$DEPLOY_PATH" git checkout -f
+
+cd "\$DEPLOY_PATH"
+RUBY_VERSION=\$(ruby --version)
+BUNDLER_VERSION=\$(bundle --version | cut -d ' ' -f 3)
+
+echo "Using rvm \$RVM_VERSION"
+echo "Using \$RUBY_VERSION"
+echo "Rack environment set to \$RACK_ENV"
+
+message "Installing gems with Bundler \$BUNDLER_VERSION"
+bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment || exit_with_error
+rvmsudo ./bin/foreman export upstart /etc/init -a "\$APP_NAME" -u deployer
+message "Restarting application" && sudo restart "\$APP_NAME"
+
+message "Deploy complete!"
 echo
 EOD
 
