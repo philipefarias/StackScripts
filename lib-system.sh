@@ -107,10 +107,6 @@ function sshd_config_pubkeyauthentication {
     sshd_config_edit_bool "PubkeyAuthentication" "$1"
 }
 
-function sshd_config_passwordauthentication {
-    sshd_config_edit_bool "PasswordAuthentication" "$1"
-}
-
 # Email
 function install_postfix {
   # $1 - root email
